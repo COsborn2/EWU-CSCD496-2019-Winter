@@ -11,12 +11,42 @@ namespace SecretSanta.Api.Controllers
     [ApiController]
     public class GiftController : ControllerBase
     {
-        private readonly IGiftService _GiftService;
+        private readonly IGiftService _giftService;
 
         public GiftController(IGiftService giftService)
         {
-            _GiftService = giftService ?? throw new ArgumentNullException(nameof(giftService));
+            _giftService = giftService ?? throw new ArgumentNullException(nameof(giftService));
         }
+        
+        // AddGiftToUser
+        [HttpPut("{userId}")]
+        public ActionResult<DTO.Gift> AddGiftToUser(int userId, DTO.Gift gift)
+        {
+            if (userId <= 0)
+            {
+                return NotFound();
+            }
+            
+            Gift domainGift = new Gift()
+            {
+                Id = gift.Id,
+                Title = gift.Title,
+                Description = gift.Description,
+                OrderOfImportance = gift.OrderOfImportance,
+                Url = gift.Url
+            };
+
+            _giftService.AddGiftToUser(userId, domainGift);
+
+            return gift;
+        }
+
+        // UpdateGiftForUser
+        /*[HttpPut()]
+        public ActionResult<DTO.Gift> UpdateGiftForUser(int userId)
+        {
+            return null;
+        }*/
 
         // GET api/Gift/5
         [HttpGet("{userId}")]
@@ -26,9 +56,16 @@ namespace SecretSanta.Api.Controllers
             {
                 return NotFound();
             }
-            List<Gift> databaseUsers = _GiftService.GetGiftsForUser(userId);
+            List<Gift> databaseUsers = _giftService.GetGiftsForUser(userId);
 
             return databaseUsers.Select(x => new DTO.Gift(x)).ToList();
         }
+        
+        // Remove gift
+        /*[HttpDelete()]
+        public void DeleteGiftForUser(int userId)
+        {
+            
+        }*/
     }
 }
