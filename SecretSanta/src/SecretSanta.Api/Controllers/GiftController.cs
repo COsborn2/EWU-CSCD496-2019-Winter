@@ -17,28 +17,19 @@ namespace SecretSanta.Api.Controllers
         {
             _giftService = giftService ?? throw new ArgumentNullException(nameof(giftService));
         }
-        
+
         // AddGiftToUser
-        [HttpPut("{userId}")]
+        [HttpPost("{userId}")]
         public ActionResult<DTO.Gift> AddGiftToUser(int userId, DTO.Gift gift)
         {
             if (userId <= 0)
             {
                 return NotFound();
             }
+
+            SecretSanta.Domain.Models.Gift updatedGift = _giftService.AddGiftToUser(userId, DTO.Gift.ToDomain(gift));
             
-            Gift domainGift = new Gift()
-            {
-                Id = gift.Id,
-                Title = gift.Title,
-                Description = gift.Description,
-                OrderOfImportance = gift.OrderOfImportance,
-                Url = gift.Url
-            };
-
-            _giftService.AddGiftToUser(userId, domainGift);
-
-            return gift;
+            return new ActionResult<DTO.Gift>(updatedGift);
         }
 
         // UpdateGiftForUser
